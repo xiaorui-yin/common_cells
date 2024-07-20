@@ -17,6 +17,7 @@
 `define COMMON_CELLS_REGISTERS_SVH_
 
 // Abridged Summary of available FF macros:
+// `DFF:     asynchronous active-low reset
 // `FF:      asynchronous active-low reset
 // `FFAR:    asynchronous active-high reset
 // `FFARN:   [deprecated] asynchronous active-low reset
@@ -37,6 +38,21 @@
 
 `define REG_DFLT_CLK clk_i
 `define REG_DFLT_RST rst_ni
+
+// Flip-Flop with asynchronous active-low reset
+// __name: name of the register
+// __reset_value: value assigned upon reset
+// (__clk: clock input)
+// (__arst_n: asynchronous reset, active-low)
+`define FF(__name, __reset_value = '0, __clk = `REG_DFLT_CLK, __arst_n = `REG_DFLT_RST)    \
+  _type __name``_d, __name``_q;                                                            \
+  always_ff @(posedge (__clk) or negedge (__arst_n)) begin                                 \
+    if (!__arst_n) begin                                                                   \
+      __name``_q <= (__reset_value);                                                       \
+    end else begin                                                                         \
+      __name``_q <= (__name``_d);                                                          \
+    end                                                                                    \
+  end
 
 // Flip-Flop with asynchronous active-low reset
 // __q: Q output of FF
